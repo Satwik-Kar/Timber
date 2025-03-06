@@ -61,9 +61,11 @@ int main() {
     const float gravity = 980.0f;   
     const float jumpStrength = -600.0f;  
     const float groundY = 700;  
+    const float playerSpeed = 400.0f; // Speed for left/right movement
     Keyboard k;
      axeSprite.setOrigin(120,0);
     while (window.isOpen()) {
+        float deltaTime = clock.restart().asSeconds();
         Event event;
         while (window.pollEvent(event)) {
             if (event.type == Event::Closed){
@@ -74,21 +76,23 @@ int main() {
                 isJumping = true;   
             }
             if (event.type == Event::KeyPressed && event.key.code == Keyboard::LControl) {
-            
                 axeSprite.setRotation(-40);
-
             }
             if (event.type == Event::KeyReleased && event.key.code == Keyboard::LControl) {
-            
                 axeSprite.setRotation(40);
-
             }
-            
         }
-         
-       
-        float deltaTime = clock.restart().asSeconds();
-      
+        
+        // Player movement left/right
+        if (Keyboard::isKeyPressed(Keyboard::Left)) {
+            playerSprite.setScale(1,1);
+            playerSprite.move(-playerSpeed * deltaTime, 0);
+        }
+        if (Keyboard::isKeyPressed(Keyboard::Right)) {
+            playerSprite.setScale(-1,1);
+            playerSprite.move(playerSpeed * deltaTime, 0);
+        }
+        
         beeSprite.move(beeSpeedX * deltaTime, beeSpeedY * deltaTime);
         cloudSprite1.move(cloud1SpeedX*deltaTime,0);
         cloudSprite2.move(cloud2SpeedX*deltaTime,0);
@@ -125,9 +129,8 @@ int main() {
         playerVelocityY += gravity * deltaTime;
         playerSprite.move(0, playerVelocityY * deltaTime);
 
-         
         if (playerSprite.getPosition().y >= groundY) {
-            playerSprite.setPosition(1200, groundY);
+            playerSprite.setPosition(playerSprite.getPosition().x, groundY);
             isJumping = false;
             playerVelocityY = 0;
         }
@@ -140,13 +143,10 @@ int main() {
         window.draw(cloudSprite2);
         window.draw(cloudSprite3);
         window.draw(cloudSprite4);
-
         window.draw(cloudSprite5);
-
         window.draw(cloudSprite6);
         window.draw(playerSprite);
         window.draw(axeSprite);
-
         window.draw(beeSprite);
         window.display();
     }
